@@ -1,13 +1,13 @@
 {
   "functions": {
     "server/index.js": {
-      "runtime": "nodejs18.x"
+      "maxDuration": 30
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "server/index.js"
+      "source": "/(.*)",
+      "destination": "server/index.js"
     }
   ]
 }
