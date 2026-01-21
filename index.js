@@ -31,7 +31,7 @@ const connectDB = async () => {
   }
 
   try {
-    await mongoose.connect(MONGODB_URI, {
+    await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000,
@@ -39,19 +39,38 @@ const connectDB = async () => {
     });
     isDbConnected = true;
     console.log('✅ MongoDB connected successfully');
+    
+    // Handle connection events
+    mongoose.connection.on('error', (err) => {
+      console.error('MongoDB connection error:', err);
+      isDbConnected = false;
+    });
+    
+    mongoose.connection.on('disconnected', () => {
+      console.log('MongoDB disconnected');
+      isDbConnected = false;
+    });
+    
   } catch (err) {
     console.error('❌ MongoDB connection error:', err.message);
-    // In Vercel, we don't want to crash the function
-    if (process.env.NODE_ENV !== 'production') {
-      process.exit(1); // Exit only in development
-    }
+    // In serverless environment, we don't crash
+    isDbConnected = false;
   }
 };
 
-// Connect to database on first request
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    if (!isDbConnected && mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database connection not available'
+      });
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Import Routes
