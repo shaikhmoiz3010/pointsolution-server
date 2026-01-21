@@ -7,9 +7,9 @@
     "start": "node server/index.js",
     "dev": "nodemon server/index.js",
     "seed": "node server/seed.js",
+    "vercel-build": "echo 'Vercel: No build step required'",
     "vercel-dev": "vercel dev",
-    "vercel-deploy": "vercel --prod",
-    "vercel-logs": "vercel logs"
+    "vercel-deploy": "vercel --prod"
   },
   "dependencies": {
     "express": "^4.18.2",
@@ -24,6 +24,6 @@
     "nodemon": "^2.0.22"
   },
   "engines": {
-    "node": ">=14.x"
+    "node": ">=18.x"
   }
 }
